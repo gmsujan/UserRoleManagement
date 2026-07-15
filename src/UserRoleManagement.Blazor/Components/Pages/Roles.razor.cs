@@ -140,7 +140,6 @@ public partial class Roles
     private async Task CancelWarningAsync()
     {
         await _warningModal.Hide();
-        // The edit modal stays open — the user can change the name.
     }
 
     private async Task PersistAsync()

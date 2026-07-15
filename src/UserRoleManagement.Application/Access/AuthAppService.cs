@@ -30,8 +30,6 @@ public class AuthAppService : ApplicationService, IAuthAppService
         var user = await queryable
             .FirstOrDefaultAsync(u => u.UserName == input.UserName);
 
-        // Same failure result whether the user doesn't exist,
-        // is inactive, or the password is wrong. See note below.
         if (user == null ||
             !user.IsActive ||
             !_passwordHasher.VerifyPassword(input.Password, user.PasswordHash))

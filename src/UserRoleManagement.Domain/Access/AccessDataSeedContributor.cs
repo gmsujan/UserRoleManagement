@@ -85,8 +85,7 @@ public class AccessDataSeedContributor : IDataSeedContributor, ITransientDepende
             _guidGenerator.Create(),
             adminRoleName,
             "Full access to users and roles.");
-
-        // Grant every permission that exists.
+        
         var allPermissions = await _permissionRepository.GetListAsync();
 
         foreach (var permission in allPermissions)
@@ -115,7 +114,7 @@ public class AccessDataSeedContributor : IDataSeedContributor, ITransientDepende
             adminUserName,
             "accessadmin@buddhaair.com",
             "Access Administrator",
-            _passwordHasher.HashPassword("Admin@123")   // change this
+            _passwordHasher.HashPassword("Admin@123")   
         );
 
         user.UserRoles.Add(new AppUserRole(user.Id, adminRole.Id));
