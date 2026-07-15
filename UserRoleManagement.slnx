@@ -1,0 +1,20 @@
+<Solution>
+    <Folder Name="/src/">
+        <Project Path="src/UserRoleManagement.Domain/UserRoleManagement.Domain.csproj" />
+        <Project Path="src/UserRoleManagement.Application/UserRoleManagement.Application.csproj" />
+        <Project Path="src/UserRoleManagement.EntityFrameworkCore/UserRoleManagement.EntityFrameworkCore.csproj" />
+        <Project Path="src/UserRoleManagement.Domain.Shared/UserRoleManagement.Domain.Shared.csproj" />
+        <Project Path="src/UserRoleManagement.Application.Contracts/UserRoleManagement.Application.Contracts.csproj" />
+        <Project Path="src/UserRoleManagement.HttpApi/UserRoleManagement.HttpApi.csproj" />
+        <Project Path="src/UserRoleManagement.HttpApi.Client/UserRoleManagement.HttpApi.Client.csproj" />
+        <Project Path="src/UserRoleManagement.DbMigrator/UserRoleManagement.DbMigrator.csproj" />
+        <Project Path="src/UserRoleManagement.Blazor/UserRoleManagement.Blazor.csproj" />
+    </Folder>
+    <Folder Name="/test/">
+        <Project Path="test/UserRoleManagement.Application.Tests/UserRoleManagement.Application.Tests.csproj" />
+        <Project Path="test/UserRoleManagement.EntityFrameworkCore.Tests/UserRoleManagement.EntityFrameworkCore.Tests.csproj" />
+        <Project Path="test/UserRoleManagement.TestBase/UserRoleManagement.TestBase.csproj" />
+        <Project Path="test/UserRoleManagement.Domain.Tests/UserRoleManagement.Domain.Tests.csproj" />
+        <Project Path="test/UserRoleManagement.HttpApi.Client.ConsoleTestApp/UserRoleManagement.HttpApi.Client.ConsoleTestApp.csproj" />
+    </Folder>
+</Solution>

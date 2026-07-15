@@ -1,0 +1,176 @@
+﻿@page "/roles"
+@using System.Linq
+@using Microsoft.AspNetCore.Components
+@using Blazorise
+@using UserRoleManagement.Access
+@using Volo.Abp.AspNetCore.Components.Messages
+@inject IRoleAppService RoleAppService
+@inject IUiMessageService UiMessageService
+
+<Card>
+    <CardHeader>
+        <Row Class="justify-content-between align-items-center">
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <h2>Roles</h2>
+            </Column>
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <Button Color="Color.Primary" Clicked="OpenCreateModalAsync">
+                    New Role
+                </Button>
+            </Column>
+        </Row>
+    </CardHeader>
+
+    <CardBody>
+        <DataGrid TItem="RoleDto"
+                  Data="RoleList"
+                  TotalItems="TotalCount"
+                  ShowPager="true"
+                  PageSize="PageSize"
+                  Responsive="true">
+
+            <DataGridColumn TItem="RoleDto" Field="@nameof(RoleDto.Name)" Caption="Name" />
+            <DataGridColumn TItem="RoleDto" Field="@nameof(RoleDto.Description)" Caption="Description" />
+
+            <DataGridColumn TItem="RoleDto" Field="@nameof(RoleDto.IsActive)" Caption="Active">
+                <DisplayTemplate>
+                    @(context.Item.IsActive ? "Yes" : "No")
+                </DisplayTemplate>
+            </DataGridColumn>
+
+            <DataGridColumn TItem="RoleDto" Caption="Permissions">
+                <DisplayTemplate>
+                    @context.Item.PermissionIds.Count granted
+                </DisplayTemplate>
+            </DataGridColumn>
+
+            <DataGridColumn TItem="RoleDto" Caption="Actions" Sortable="false">
+                <DisplayTemplate>
+                    <Button Color="Color.Secondary" Size="Size.Small"
+                            Clicked="() => OpenEditModalAsync(context.Item)">
+                        Edit
+                    </Button>
+                    <Button Color="Color.Danger" Size="Size.Small"
+                            Clicked="() => DeleteAsync(context.Item)">
+                        Delete
+                    </Button>
+                </DisplayTemplate>
+            </DataGridColumn>
+
+        </DataGrid>
+    </CardBody>
+</Card>
+
+
+<Modal @ref="_modal">
+    <ModalContent Centered="true" Size="ModalSize.Large">
+        <ModalHeader>
+            <ModalTitle>@(_editingId == null ? "New Role" : "Edit Role")</ModalTitle>
+            <CloseButton Clicked="CloseModalAsync" />
+        </ModalHeader>
+
+        <ModalBody>
+            <Field>
+                <FieldLabel>Name</FieldLabel>
+                <TextInput @bind-Value="_editing.Name" />
+            </Field>
+
+            <Field>
+                <FieldLabel>Description</FieldLabel>
+                <TextInput @bind-Value="_editing.Description" />
+            </Field>
+
+            <Field>
+                <label>
+                    <input type="checkbox"
+                           checked="@_editing.IsActive"
+                           @onchange="@((ChangeEventArgs e) => _editing.IsActive = (bool)e.Value)" />
+                    Active
+                </label>
+            </Field>
+
+            <Divider />
+
+            <FieldLabel>Permissions</FieldLabel>
+
+            @foreach (var group in AllPermissions.GroupBy(p => p.Group))
+            {
+                <Card Class="mb-2">
+                    <CardBody>
+                        <strong>@group.Key</strong>
+                        <br />
+                        @foreach (var permission in group)
+                        {
+                            var id = permission.Id;
+                            <label class="d-block">
+                                <input type="checkbox"
+                                       checked="@_editing.PermissionIds.Contains(id)"
+                                       @onchange="@((ChangeEventArgs e) => TogglePermission(id, (bool)e.Value))" />
+                                @permission.DisplayName
+                            </label>
+                        }
+                    </CardBody>
+                </Card>
+            }
+        </ModalBody>
+
+        <ModalFooter>
+            <Button Color="Color.Secondary" Clicked="CloseModalAsync">Cancel</Button>
+            <Button Color="Color.Primary" Clicked="SaveAsync">Save</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+
+<Modal @ref="_warningModal">
+    <ModalContent Centered="true">
+        <ModalHeader>
+            <ModalTitle>Role Previously Deleted</ModalTitle>
+            <CloseButton Clicked="CancelWarningAsync" />
+        </ModalHeader>
+
+        <ModalBody>
+            <p>
+                A role named <strong>@_editing.Name</strong> was previously created
+                and deleted on <strong>@_deletedInfo?.DeletionTime?.ToString("g")</strong>.
+            </p>
+            @if (!string.IsNullOrWhiteSpace(_deletedInfo?.Description))
+            {
+                <p class="text-muted">Its description was: "@_deletedInfo.Description"</p>
+            }
+            <p>
+                Creating a new role with this name will not restore the old one —
+                it will be a separate role with its own permissions.
+            </p>
+            <p>Do you want to continue?</p>
+        </ModalBody>
+
+        <ModalFooter>
+            <Button Color="Color.Secondary" Clicked="CancelWarningAsync">Cancel</Button>
+            <Button Color="Color.Warning" Clicked="ConfirmCreateAsync">Create Anyway</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+
+@if (_canCreate)
+{
+    <Button Color="Color.Primary" Clicked="OpenCreateModalAsync">New Role</Button>
+}
+
+<DataGridColumn TItem="RoleDto" Caption="Actions" Sortable="false">
+    <DisplayTemplate>
+        @if (_canEdit)
+        {
+            <Button Color="Color.Secondary" Size="Size.Small"
+                    Clicked="() => OpenEditModalAsync(context.Item)">
+                Edit
+            </Button>
+        }
+        @if (_canDelete)
+        {
+            <Button Color="Color.Danger" Size="Size.Small"
+                    Clicked="() => DeleteAsync(context.Item)">
+                Delete
+            </Button>
+        }
+    </DisplayTemplate>
+</DataGridColumn>

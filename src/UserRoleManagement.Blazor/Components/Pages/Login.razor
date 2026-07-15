@@ -1,0 +1,66 @@
+﻿@page "/access-login"
+@using Blazorise
+@using UserRoleManagement.Access
+@inject IAuthAppService AuthAppService
+@inject NavigationManager NavigationManager
+
+<Container>
+    <Row Class="justify-content-center mt-5">
+        <Column ColumnSize="ColumnSize.Is4">
+            <Card>
+                <CardHeader>
+                    <h3>Sign In</h3>
+                </CardHeader>
+                <CardBody>
+
+                    @if (!string.IsNullOrEmpty(_error))
+                    {
+                        <Alert Color="Color.Danger" Visible="true">
+                            @_error
+                        </Alert>
+                    }
+
+                    <Field>
+                        <FieldLabel>Username</FieldLabel>
+                        <TextInput @bind-Value="_userName" />
+                    </Field>
+
+                    <Field>
+                        <FieldLabel>Password</FieldLabel>
+                        <TextInput Role="TextRole.Password" @bind-Value="_password" />
+                    </Field>
+
+                    <Button Color="Color.Primary" Clicked="SubmitAsync" Block="true">
+                        Sign In
+                    </Button>
+
+                </CardBody>
+            </Card>
+        </Column>
+    </Row>
+</Container>
+
+@code {
+    private string _userName = "";
+    private string _password = "";
+    private string _error = "";
+
+    private async Task SubmitAsync()
+    {
+        _error = "";
+
+        var result = await AuthAppService.ValidateCredentialsAsync(
+            new LoginDto { UserName = _userName, Password = _password });
+
+        if (!result.Success)
+        {
+            _error = "Invalid username or password.";
+            return;
+        }
+
+        // Hand off to a plain HTTP endpoint to actually write the cookie.
+        NavigationManager.NavigateTo(
+            $"/access-signin?userId={result.UserId}&userName={Uri.EscapeDataString(result.UserName)}",
+            forceLoad: true);
+    }
+}

@@ -1,0 +1,160 @@
+﻿@page "/users"
+@using System.Linq
+@using Microsoft.AspNetCore.Components
+@using Blazorise
+@using UserRoleManagement.Access
+@using Volo.Abp.AspNetCore.Components.Messages
+@inject IUserAppService UserAppService
+@inject IRoleAppService RoleAppService
+@inject IUiMessageService UiMessageService
+
+<Card>
+    <CardHeader>
+        <Row Class="justify-content-between align-items-center">
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <h2>Users</h2>
+            </Column>
+            <Column ColumnSize="ColumnSize.IsAuto">
+                @if (_canCreate)
+                {
+                    <Button Color="Color.Primary" Clicked="OpenCreateModalAsync">
+                        New User
+                    </Button>
+                }
+            </Column>
+        </Row>
+    </CardHeader>
+
+    <CardBody>
+        <DataGrid TItem="UserDto"
+                  Data="UserList"
+                  TotalItems="TotalCount"
+                  ShowPager="true"
+                  PageSize="PageSize"
+                  Responsive="true">
+
+            <DataGridColumn TItem="UserDto" Field="@nameof(UserDto.UserName)" Caption="Username" />
+            <DataGridColumn TItem="UserDto" Field="@nameof(UserDto.FullName)" Caption="Full Name" />
+            <DataGridColumn TItem="UserDto" Field="@nameof(UserDto.Email)" Caption="Email" />
+
+            <DataGridColumn TItem="UserDto" Field="@nameof(UserDto.IsActive)" Caption="Active">
+                <DisplayTemplate>
+                    @(context.Item.IsActive ? "Yes" : "No")
+                </DisplayTemplate>
+            </DataGridColumn>
+
+            <DataGridColumn TItem="UserDto" Caption="Roles">
+                <DisplayTemplate>
+                    @if (context.Item.RoleNames.Any())
+                    {
+                        @string.Join(", ", context.Item.RoleNames)
+                    }
+                    else
+                    {
+                        <span class="text-muted">none</span>
+                    }
+                </DisplayTemplate>
+            </DataGridColumn>
+
+            <DataGridColumn TItem="UserDto" Caption="Actions" Sortable="false">
+                <DisplayTemplate>
+                    @if (_canEdit)
+                    {
+                        <Button Color="Color.Secondary" Size="Size.Small"
+                                Clicked="() => OpenEditModalAsync(context.Item)">
+                            Edit
+                        </Button>
+                    }
+                    @if (_canDelete)
+                    {
+                        <Button Color="Color.Danger" Size="Size.Small"
+                                Clicked="() => DeleteAsync(context.Item)">
+                            Delete
+                        </Button>
+                    }
+                </DisplayTemplate>
+            </DataGridColumn>
+
+        </DataGrid>
+    </CardBody>
+</Card>
+
+
+<Modal @ref="_modal">
+    <ModalContent Centered="true" Size="ModalSize.Large">
+        <ModalHeader>
+            <ModalTitle>@(_editingId == null ? "New User" : "Edit User")</ModalTitle>
+            <CloseButton Clicked="CloseModalAsync" />
+        </ModalHeader>
+
+        <ModalBody>
+
+            @if (_editingId == null)
+            {
+                <Field>
+                    <FieldLabel>Username</FieldLabel>
+                    <TextInput @bind-Value="_userName" />
+                </Field>
+
+                <Field>
+                    <FieldLabel>Password</FieldLabel>
+                    <TextInput Role="TextRole.Password" @bind-Value="_password" />
+                </Field>
+            }
+            else
+            {
+                <Field>
+                    <FieldLabel>Username</FieldLabel>
+                    <p class="form-control-plaintext"><strong>@_userName</strong></p>
+                    <small class="text-muted">Usernames cannot be changed.</small>
+                </Field>
+            }
+
+            <Field>
+                <FieldLabel>Full Name</FieldLabel>
+                <TextInput @bind-Value="_fullName" />
+            </Field>
+
+            <Field>
+                <FieldLabel>Email</FieldLabel>
+                <TextInput @bind-Value="_email" />
+            </Field>
+
+            <Field>
+                <label>
+                    <input type="checkbox"
+                           checked="@_isActive"
+                           @onchange="@((ChangeEventArgs e) => _isActive = (bool)e.Value)" />
+                    Active
+                </label>
+            </Field>
+
+            <Divider />
+
+            <FieldLabel>Roles</FieldLabel>
+
+            @if (!AllRoles.Any())
+            {
+                <p class="text-muted">No roles exist yet. Create one on the Roles page first.</p>
+            }
+
+            @foreach (var role in AllRoles)
+            {
+                var id = role.Id;
+                <label class="d-block">
+                    <input type="checkbox"
+                           checked="@_roleIds.Contains(id)"
+                           @onchange="@((ChangeEventArgs e) => ToggleRole(id, (bool)e.Value))" />
+                    <strong>@role.Name</strong>
+                    <span class="text-muted">— @role.Description</span>
+                </label>
+            }
+
+        </ModalBody>
+
+        <ModalFooter>
+            <Button Color="Color.Secondary" Clicked="CloseModalAsync">Cancel</Button>
+            <Button Color="Color.Primary" Clicked="SaveAsync">Save</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
