@@ -34,8 +34,6 @@ public class UserAppService : ApplicationService, IUserAppService
         _currentUser = currentUser;
     }
 
-    // ---------- authorization gate ----------
-
     private async Task CheckPermissionAsync(string permissionCode)
     {
         var userId = await _currentUser.GetUserIdAsync();   // ← await + Async
@@ -46,8 +44,6 @@ public class UserAppService : ApplicationService, IUserAppService
             throw new AbpAuthorizationException("You are not authorized to perform this action.");
         }
     }
-
-    // ---------- CRUD ----------
 
     public async Task<UserDto> GetAsync(Guid id)
     {
@@ -152,8 +148,6 @@ public class UserAppService : ApplicationService, IUserAppService
 
         return MapToDto(await GetUserWithRolesAsync(id));
     }
-
-    // ---------- helpers ----------
 
     private async Task<AppUser> GetUserWithRolesAsync(Guid id)
     {

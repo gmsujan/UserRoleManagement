@@ -53,8 +53,6 @@ public partial class Users
 
     private async Task LoadRolesAsync()
     {
-        // Needs Roles.View — a user who can manage users but not view roles
-        // simply gets an empty role list rather than an error.
         if (!await CurrentUser.IsGrantedAsync(AppPermissions.RolesView))
         {
             AllRoles = new List<RoleDto>();
@@ -93,11 +91,11 @@ public partial class Users
     {
         _editingId = user.Id;
         _userName = user.UserName;
-        _password = "";                    // we don't have it, and never will
+        _password = "";                    
         _fullName = user.FullName;
         _email = user.Email;
         _isActive = user.IsActive;
-        _roleIds = user.RoleIds.ToList();  // copy, not reference
+        _roleIds = user.RoleIds.ToList();  
 
         await _modal.Show();
     }

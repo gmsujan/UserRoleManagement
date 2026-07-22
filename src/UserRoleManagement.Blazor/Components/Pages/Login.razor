@@ -1,59 +1,269 @@
-﻿@page "/access-login"
+@page "/access-login"
+@layout BlankLayout
 @using Blazorise
+@using Microsoft.AspNetCore.Components.Web
 @using UserRoleManagement.Access
 @inject IAuthAppService AuthAppService
 @inject NavigationManager NavigationManager
 
-<Container>
-    <Row Class="justify-content-center mt-5">
-        <Column ColumnSize="ColumnSize.Is4">
-            <Card>
-                <CardHeader>
-                    <h3>Sign In</h3>
-                </CardHeader>
-                <CardBody>
+<div class="login-shell">
 
-                    @if (!string.IsNullOrEmpty(_error))
+    <!-- ============ LEFT : BRAND VISUAL ============ -->
+    <div class="login-visual">
+
+        <!-- drifting aurora layers -->
+        <div class="aurora aurora-a" aria-hidden="true"></div>
+        <div class="aurora aurora-b" aria-hidden="true"></div>
+        <div class="aurora aurora-c" aria-hidden="true"></div>
+
+        <!-- perspective grid floor -->
+        <div class="grid-floor" aria-hidden="true"></div>
+
+        <!-- twinkling particle field -->
+        <div class="starfield" aria-hidden="true">
+            @foreach (var s in Stars)
+            {
+                <span class="star"
+                      style="left:@(s.X)%;top:@(s.Y)%;width:@(s.Size)px;height:@(s.Size)px;animation-delay:@(s.Delay)ms;animation-duration:@(s.Duration)ms"></span>
+            }
+        </div>
+
+        <!-- animated flight path -->
+        <svg class="flightpath" viewBox="0 0 420 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <path id="arcMain" class="arc arc-main" d="M-10,268 C110,258 190,150 200,96 C210,44 300,26 430,52" />
+            <path class="arc arc-ghost" d="M-10,296 C130,286 210,190 240,140 C275,82 350,70 430,96" />
+
+            <circle class="node node-start" cx="-10" cy="268" r="3.5" />
+            <circle class="node node-end" cx="430" cy="52" r="3.5" />
+
+            <g class="craft">
+                <circle class="craft-glow" r="9" />
+                <circle class="craft-core" r="3.4" />
+                <animateMotion dur="11s" repeatCount="indefinite" rotate="auto" keyPoints="0;1" keyTimes="0;1" calcMode="linear">
+                    <mpath href="#arcMain" />
+                </animateMotion>
+            </g>
+        </svg>
+
+        <!-- floating geometry -->
+        <span class="orbit orbit-a" aria-hidden="true"></span>
+        <span class="orbit orbit-b" aria-hidden="true"></span>
+        <span class="glyph glyph-a" aria-hidden="true">+</span>
+        <span class="glyph glyph-b" aria-hidden="true">+</span>
+
+        <!-- brand -->
+        <div class="brand-mark">
+            <span class="brand-badge">
+                <svg viewBox="0 0 48 48" aria-hidden="true">
+                    <circle cx="18" cy="17" r="9" stroke="#E3A73A" stroke-width="2.6" fill="none" />
+                    <circle cx="27.5" cy="27" r="12" stroke="#F4F8FC" stroke-width="2.6" fill="none" />
+                </svg>
+            </span>
+            <span class="brand-name">WingCraft</span>
+        </div>
+
+        <!-- headline -->
+        <div class="visual-copy">
+            <span class="eyebrow">
+                <span class="eyebrow-dot"></span>
+                Operations Portal
+            </span>
+
+            <h1>
+                <span class="word" style="--i:0">Welcome</span>
+                <span class="word" style="--i:1">back</span>
+                <span class="word accent" style="--i:2">aboard.</span>
+            </h1>
+
+            <p class="lede">
+                Sign in to keep flight logs, components, and audit records
+                current across every aircraft in the fleet.
+            </p>
+
+            <ul class="feature-list">
+                <li style="--i:0"><span class="tick"></span>Live flight &amp; maintenance logs</li>
+                <li style="--i:1"><span class="tick"></span>Component lifecycle tracking</li>
+                <li style="--i:2"><span class="tick"></span>Tamper-evident audit records</li>
+            </ul>
+        </div>
+
+        <div class="status-strip">
+            <span class="pulse-dot"></span>
+            <span class="status-text">SYSTEMS NOMINAL</span>
+            <span class="status-sep">/</span>
+            <span class="status-text dim">SECURE CHANNEL</span>
+        </div>
+
+    </div>
+
+    <!-- ============ RIGHT : FORM ============ -->
+    <div class="login-panel">
+        <div class="panel-glow" aria-hidden="true"></div>
+
+        <div class="login-form" @onkeydown="HandleKeyDownAsync">
+
+            <div class="form-head" style="--i:0">
+                <h2>Sign In</h2>
+                <p>Enter your credentials to continue.</p>
+            </div>
+
+            @if (!string.IsNullOrEmpty(_error))
+            {
+                <div class="login-alert" role="alert">
+                    <svg class="alert-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M12 7.5v5" />
+                        <path d="M12 16.2v.3" />
+                    </svg>
+                    <span>@_error</span>
+                </div>
+            }
+
+            <div class="field" style="--i:1">
+                <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="8" r="3.4" />
+                    <path d="M5 20c0-4 3.2-6.5 7-6.5s7 2.5 7 6.5" />
+                </svg>
+                <TextInput @bind-Value="_userName"
+                           Class="login-input"
+                           Placeholder=" "
+                           Disabled="_isSubmitting" />
+                <label class="field-label">Username or email</label>
+                <span class="field-underglow"></span>
+            </div>
+
+            <div class="field" style="--i:2">
+                <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="5" y="10.5" width="14" height="9.5" rx="2" />
+                    <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" />
+                </svg>
+                <TextInput @bind-Value="_password"
+                           Role="@(_showPassword ? TextRole.Text : TextRole.Password)"
+                           Class="login-input has-trail"
+                           Placeholder=" "
+                           Disabled="_isSubmitting" />
+                <label class="field-label">Password</label>
+                <button type="button"
+                        class="field-trail"
+                        tabindex="-1"
+                        title="@(_showPassword ? "Hide password" : "Show password")"
+                        aria-label="@(_showPassword ? "Hide password" : "Show password")"
+                        @onclick="TogglePassword">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12Z" />
+                        <circle cx="12" cy="12" r="3.1" />
+                        @if (!_showPassword)
+                        {
+                            <line class="eye-slash" x1="4" y1="20" x2="20" y2="4" />
+                        }
+                    </svg>
+                </button>
+                <span class="field-underglow"></span>
+            </div>
+
+            <div class="login-row" style="--i:3">
+                <label class="remember-me">
+                    <input type="checkbox" @bind="_rememberMe" />
+                    <span class="checkbox-box"></span>
+                    <span>Remember me</span>
+                </label>
+                <a href="#" class="forgot-link">Forgot password?</a>
+            </div>
+
+            <button type="button"
+                    class="login-button @(_isSubmitting ? "is-busy" : "")"
+                    style="--i:4"
+                    disabled="@_isSubmitting"
+                    @onclick="SubmitAsync">
+                <span class="btn-label">
+                    @if (_isSubmitting)
                     {
-                        <Alert Color="Color.Danger" Visible="true">
-                            @_error
-                        </Alert>
+                        <span class="btn-spinner"></span>
+                        <span>Signing in&hellip;</span>
                     }
+                    else
+                    {
+                        <span>Sign In</span>
+                        <svg class="btn-arrow" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M5 12h13" />
+                            <path d="M12.5 6.5 19 12l-6.5 5.5" />
+                        </svg>
+                    }
+                </span>
+                <span class="btn-shine" aria-hidden="true"></span>
+            </button>
 
-                    <Field>
-                        <FieldLabel>Username</FieldLabel>
-                        <TextInput @bind-Value="_userName" />
-                    </Field>
+            <p class="login-footnote" style="--i:5">
+                Need an account? <a href="#">Contact your system administrator</a>
+            </p>
 
-                    <Field>
-                        <FieldLabel>Password</FieldLabel>
-                        <TextInput Role="TextRole.Password" @bind-Value="_password" />
-                    </Field>
+        </div>
+    </div>
 
-                    <Button Color="Color.Primary" Clicked="SubmitAsync" Block="true">
-                        Sign In
-                    </Button>
-
-                </CardBody>
-            </Card>
-        </Column>
-    </Row>
-</Container>
+</div>
 
 @code {
     private string _userName = "";
     private string _password = "";
     private string _error = "";
+    private bool _rememberMe;
+    private bool _isSubmitting;
+    private bool _showPassword;
+
+    private record Star(int X, int Y, int Size, int Delay, int Duration);
+
+    // Fixed seed so the field is stable across renders and prerender/hydrate.
+    private static readonly Star[] Stars = BuildStars(34);
+
+    private static Star[] BuildStars(int count)
+    {
+        var rng = new Random(20260722);
+        var stars = new Star[count];
+
+        for (var i = 0; i < count; i++)
+        {
+            stars[i] = new Star(
+                X: rng.Next(2, 98),
+                Y: rng.Next(2, 96),
+                Size: rng.Next(2, 4),
+                Delay: rng.Next(0, 5000),
+                Duration: rng.Next(3200, 6400));
+        }
+
+        return stars;
+    }
+
+    private void TogglePassword()
+    {
+        _showPassword = !_showPassword;
+    }
+
+    private async Task HandleKeyDownAsync(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !_isSubmitting)
+        {
+            await SubmitAsync();
+        }
+    }
 
     private async Task SubmitAsync()
     {
         _error = "";
+
+        if (string.IsNullOrWhiteSpace(_userName) || string.IsNullOrWhiteSpace(_password))
+        {
+            _error = "Enter your username and password.";
+            return;
+        }
+
+        _isSubmitting = true;
 
         var result = await AuthAppService.ValidateCredentialsAsync(
             new LoginDto { UserName = _userName, Password = _password });
 
         if (!result.Success)
         {
+            _isSubmitting = false;
             _error = "Invalid username or password.";
             return;
         }

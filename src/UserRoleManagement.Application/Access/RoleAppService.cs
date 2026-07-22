@@ -35,11 +35,9 @@ public class RoleAppService : ApplicationService, IRoleAppService
         _currentUser = currentUser;
     }
 
-    // ---------- authorization gate ----------
-
     private async Task CheckPermissionAsync(string permissionCode)
     {
-        var userId = await _currentUser.GetUserIdAsync();   // ← await + Async
+        var userId = await _currentUser.GetUserIdAsync();  
 
         if (userId == null ||
             !await _permissionChecker.IsGrantedAsync(userId.Value, permissionCode))
@@ -47,8 +45,6 @@ public class RoleAppService : ApplicationService, IRoleAppService
             throw new AbpAuthorizationException("You are not authorized to perform this action.");
         }
     }
-
-    // ---------- CRUD ----------
 
     public async Task<RoleDto> GetAsync(Guid id)
     {
@@ -160,7 +156,6 @@ public class RoleAppService : ApplicationService, IRoleAppService
         await _roleRepository.DeleteAsync(id);
     }
 
-    // ---------- supporting queries ----------
 
     public async Task<DeletedRoleInfoDto> CheckDeletedRoleAsync(string name)
     {
@@ -207,8 +202,6 @@ public class RoleAppService : ApplicationService, IRoleAppService
             })
             .ToList();
     }
-
-    // ---------- helpers ----------
 
     private async Task CheckNameNotTakenAsync(string name, Guid? excludeId)
     {

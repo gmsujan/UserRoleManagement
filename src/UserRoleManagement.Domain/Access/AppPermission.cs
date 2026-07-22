@@ -5,9 +5,9 @@ namespace UserRoleManagement.Access;
 
 public class AppPermission : Entity<Guid>
 {
-    public string Code { get; set; }        // "WorkOrders.Delete" — what code checks
-    public string DisplayName { get; set; } // "Delete Work Order" — what humans read
-    public string Group { get; set; }       // "Work Orders" — for grouping on the UI
+    public string Code { get; set; }    // Users.Create    
+    public string DisplayName { get; set; } // Create Users
+    public string Group { get; set; }    // Users or Roles
 
     private AppPermission() { }
 
