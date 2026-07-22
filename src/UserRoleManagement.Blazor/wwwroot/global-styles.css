@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
 #blazor-error-ui {
     background: lightyellow;
     color: #212529;
@@ -24,10 +26,21 @@
 }
 
 :root {
-    --lpx-logo: url('/images/logo/leptonxlite/logo-light-thumbnail.png');
-    --lpx-logo-icon: url('/images/logo/leptonxlite/logo-light-thumbnail.png');
+     --lpx-brand: #1D3A78;
+    --lpx-logo: url('/images/buddha-tech/logo.webp');
+    --lpx-logo-icon: url('/images/buddha-tech/logo.webp');
 }
+
 :root .abp-account-layout .lpx-brand-logo{
     --lpx-logo: url('/images/logo/leptonxlite/logo-dark-thumbnail.png');
     background-position: left;
 }
+/*
+.lpx-side-menu, .lpx-sidebar {
+    background-color: #1D3A78 !important;
+}
+
+.lpx-main-menu,
+.lpx-side-menu-content {
+    background-color: #1D3A78 !important;
+}*/

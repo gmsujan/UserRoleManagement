@@ -281,3 +281,9 @@ src/UserRoleManagement.Blazor.Tiered/Logs/*
 # IdentityServer temp files
 tempkey.rsa
 tempkey.jwk
+
+# Claude Code local config
+.claude/
+
+#graphify
+.graphify-out/
