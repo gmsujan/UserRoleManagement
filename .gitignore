@@ -286,4 +286,4 @@ tempkey.jwk
 .claude/
 
 #graphify
-.graphify-out/
+graphify-out/
