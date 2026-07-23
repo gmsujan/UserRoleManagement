@@ -285,5 +285,3 @@ tempkey.jwk
 # Claude Code local config
 .claude/
 
-#graphify
-graphify-out/
